@@ -1,0 +1,240 @@
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MERN PART 1 Instalasi + Test Routing + Controller 
+
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+npm init --yes
+npm install express
+npm install --save emysql2
+setelah itu install nodemon secara global
+
+dan 
+1. Buat Folder src dan file App.js di dalam folder tsb kita akan melakukan
+   Routing sederhana file App.js
+ kode:
+const express = require('express');
+const app = express();
+
+//setting port
+app.set('port', process.env.PORT || 3000);
+
+//middle ware
+app.use(express.json());
+
+//import rout
+const employeeRouters = require('./routes/EmployeeRoute')
+//Route
+app.use('/employee',employeeRouters)
+
+app.use('/test', (req, res) => {
+    res.send("Test Route")
+})
+
+app.use('/', (req, res) => {
+    res.send("Hello world from node js server")
+});
+
+app.listen(app.get('port'), () => {
+    console.log('Start server Node.js')
+})
+
+
+
+
+2. Buat Folder Route dan buat File 
+-- EmployeeRoute.js
+kode :
+const express = require('express');
+const router = express.Router();
+
+router.get('/save',(req,res)=>{
+    res.json({status:"Employeed saved"});
+})
+
+module.exports = router
+
+
+sampai disini kita berhasil melakukan routeing
+pada url : localhost:3000/Employee/save
+maka hasilnya seperti ini
+:
+{ status: "Employeed saved" }
+
+
+
+
+3. Buat Folder controllers buat file EmployeeController.js
+didalmnya dan masukan kode ini :
+const controllers = {}
+
+controllers.test=(req,res)=>{
+
+    const data ={
+        name:"Teguh M H",
+        age:24,
+        city:'Jakarta'
+    }
+
+    console.log("Execute from controllers Employee")
+    res.json(data);
+
+}
+
+module.exports = controllers;
+
+
+dan coba jalankan pada browser localhost:3000/employee/test
+maka akan muncul format json seperti dibawah ini
+
+{
+        name:"Teguh M H",
+        age:24,
+        city:'Jakarta'
+ }
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MERN PART 2 Model ,Sequelize
+https://www.tutofox.com/nodejs/rest-api-crud-node-js-express-react-js-mysql-part-2-model-sequelize/
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+npm install --save sequelize
+
+1. Buat Folder Model didalamnya ada file 
+-- database.js
+let Sequelize = require('sequelize');
+
+const sequelize = new Sequelize(
+    'mern',//databasse
+    'root',//user
+    '',//password
+    {
+        host: 'localhost',
+        dialect: 'mysql'
+    }
+);
+
+module.exports = sequelize;
+
+-- Employee.js
+const Sequelize = require('sequelize');
+let sequelize = require('./database');
+//import Role for FK roleId
+let Role = require('./Role');
+//table name
+let nametable = 'empleado'
+
+let Employee = sequelize.define(nametable,{
+
+    id:{
+        type:Sequelize.INTEGER,
+        primaryKey:true,
+        autoIncrement:true
+    },
+    name:Sequelize.STRING,
+    email:Sequelize.STRING,
+    address:Sequelize.STRING,
+    phone:Sequelize.INTEGER,
+
+    //Foreign kEY
+    roleId:{
+        type:Sequelize.INTEGER,
+        //this is a reference to another model
+        references:{
+            model:Role,
+            key:'id'
+        }
+    } 
+})
+
+Employee.belongsTo(Role);
+
+module.exports = Employee
+
+
+--. Role.js
+const Sequelize = require('sequelize');
+let sequelize = require('./database');
+
+let nametable = 'role'; //nomor table
+let Role = sequelize.define(nametable, {
+    role: Sequelize.STRING
+},
+    {
+        timeStamps: false
+    }
+
+);
+
+module.exports = Role
+
+
+2.  Pada Employee Route tambahkan
+const EmployeeController = require('../controllers/EmployeeController');
+router.get('/test', EmployeeController.test);
+
+3. Pada Employee Controller tambahkan
+let sequelize = require('../model/database');
+let Employee = require('../model/Employee');
+let Role = require('../model/Role');
+
+controllers.testdata = async (req, res) => {
+    const response = await sequelize.sync().then(function () {
+
+        //create role
+        /* Role.create({
+             role: 'Admin'
+         })*/
+
+        //create employee
+        /* Employee.create({
+             name: 'Desi',
+             email: 'Desi@gmail.com',
+             address: 'Jakarta',
+             phone: '021 8291892',
+             roleId: 1
+ 
+         })*/
+
+        //call all data employee
+        const data = Employee.findAll();
+        return data;
+    })
+        .catch(error => {
+            return error;
+        });
+    res.json({ success: true, data: response })
+}
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MERN PART 3 React JS + Bootstrap
+https://www.tutofox.com/nodejs/rest-api-crud-node-js-express-react-js-mysql-part-3-create-app-react-with-bootstrap/
+++++++++++++++++++++++++++++++++++++++++++++++++++
+1. Set UP INstalasi
+
+-. npx create-react-app appnode
+-. npm start
+-. npm install bootstrap
+-. npm install jquery popper.js
+
+
+
+React Router is the routing solution for single page React applications. React Router has some great features to offer and I generally
+ end up using React Router for most of my reaction applications.
+
+npm install react-router-dom
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+MERN PART 4 Node JS +EXPRESS +MYsql+Read
+https://www.tutofox.com/nodejs/rest-api-crud-node-js-express-react-js-mysql-part-3-create-app-react-with-bootstrap/
+++++++++++++++++++++++++++++++++++++++++++++++++++
+
+npm install axios untuk nge get url nya
+
